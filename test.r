@@ -9,7 +9,23 @@ ratingsmatrix <- read_delim("C:/Users/RasmusKrusaa/Desktop/p6/matrixfactorizatio
                          trim_ws = TRUE)
 ratings <- which(ratingsmatrix != "NA", arr.ind = T)
 
-for(step in 1:5000){
+regSquaredError <- 1000
+for(step in 1:100){
+  prevRegSquaredError <- regSquaredError
+  regSquaredError <- 0
+  
+  # Calculate Regularized Squared Error
+  for(row in 1:nrow(ratings)){
+    qi <- as.matrix(Q[ratings[row, 2], ])
+    pu <- as.matrix(P[ratings[row, 1], ])
+    rui <- ratingsmatrix[ratings[row, 1], ratings[row, 2]]
+    
+    regSquaredError <- 
+      as.numeric(rui - t(qi) %*% pu)^2 +
+      lambda * (norm(qi, type = "f")^2 + norm(pu, type = "f")^2)
+  }
+  
+  # Updating P and Q
   for(row in 1:nrow(ratings)){
     tmpQ <- Q[ratings[row, 2], ] 
     tmpP <- P[ratings[row, 1], ]
@@ -23,6 +39,13 @@ for(step in 1:5000){
     P[ratings[row, 1], ] <- tmpP + gamma *
       (error * tmpQ - lambda * tmpP)
   }
+  
+  print(step)
+  print(regSquaredError)
+  
+  # if difference in error is small stop!
+  if(prevRegSquaredError - regSquaredError < 0.01)
+    break
 }
 
 Rhat <- P %*% t(Q)
