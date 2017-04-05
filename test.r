@@ -1,14 +1,17 @@
+library(readr)
+source("SimUsers.R");
+
 Q <- matrix(runif(1000, 0, 1), nrow = 1682, ncol = 20)
 P <- matrix(runif(1000, 0, 1), nrow = 943, ncol = 20)
 lambda <- 0.02
 gamma <- 0.05
 
-library(readr)
-traindata <- read_delim("C:/Users/RasmusKrusaa/Desktop/p6/matrixfactorization/ml-100k/u1.base", 
+traindata <- read_delim(paste(getwd(), "/ml-100k/u1.base", sep = ""), 
                             "\t", escape_double = FALSE, col_names = FALSE, 
                             trim_ws = TRUE)
+colnames(traindata) <- c("userId", "movieId", "rating", "timestamp");
 
-ratingsmatrix <- matrix(nrow = 943, ncol = 1682)
+ratingsmatrix <- matrix(nrow = 943, ncol = 1682);
 
 for(row in 1:nrow(traindata)){
   ratingsmatrix[as.numeric(traindata[row, 1]), as.numeric(traindata[row, 2])] <- as.numeric(traindata[row, 3])
@@ -27,10 +30,13 @@ for(step in 1:5000){
     pu <- as.matrix(P[ratings[row, 1], ])
     rui <- ratingsmatrix[ratings[row, 1], ratings[row, 2]]
     
+    #Check for NA entries in similarUsers
     regSquaredError <- regSquaredError +
       as.numeric(rui - t(qi) %*% pu)^2 +
-      lambda * (norm(qi, type = "f")^2 + norm(pu, type = "f")^2)
+      lambda * (norm(qi, type = "f")^2 + norm(pu, type = "f")^2);
   }
+  
+  
   
   # Updating P and Q
   for(row in 1:nrow(ratings)){
