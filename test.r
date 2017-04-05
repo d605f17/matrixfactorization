@@ -1,16 +1,23 @@
-Q <- matrix(runif(1000, 0, 1), nrow = 10, ncol = 2)
-P <- matrix(runif(1000, 0, 1), nrow = 10, ncol = 2)
+Q <- matrix(runif(1000, 0, 1), nrow = 1682, ncol = 20)
+P <- matrix(runif(1000, 0, 1), nrow = 943, ncol = 20)
 lambda <- 0.02
 gamma <- 0.05
 
 library(readr)
-ratingsmatrix <- read_delim("C:/Users/RasmusKrusaa/Desktop/p6/matrixfactorization/testmatrix.CSV", 
-                         ";", escape_double = FALSE, col_names = FALSE, 
-                         trim_ws = TRUE)
+traindata <- read_delim("C:/Users/RasmusKrusaa/Desktop/p6/matrixfactorization/ml-100k/u1.base", 
+                            "\t", escape_double = FALSE, col_names = FALSE, 
+                            trim_ws = TRUE)
+
+ratingsmatrix <- matrix(nrow = 943, ncol = 1682)
+
+for(row in 1:nrow(traindata)){
+  ratingsmatrix[as.numeric(traindata[row, 1]), as.numeric(traindata[row, 2])] <- as.numeric(traindata[row, 3])
+}
+
 ratings <- which(ratingsmatrix != "NA", arr.ind = T)
 
-regSquaredError <- 1000
-for(step in 1:100){
+regSquaredError <- 1000000000
+for(step in 1:5000){
   prevRegSquaredError <- regSquaredError
   regSquaredError <- 0
   
@@ -20,7 +27,7 @@ for(step in 1:100){
     pu <- as.matrix(P[ratings[row, 1], ])
     rui <- ratingsmatrix[ratings[row, 1], ratings[row, 2]]
     
-    regSquaredError <- 
+    regSquaredError <- regSquaredError +
       as.numeric(rui - t(qi) %*% pu)^2 +
       lambda * (norm(qi, type = "f")^2 + norm(pu, type = "f")^2)
   }
@@ -41,11 +48,18 @@ for(step in 1:100){
   }
   
   print(step)
+  print(prevRegSquaredError)
   print(regSquaredError)
   
   # if difference in error is small stop!
-  if(prevRegSquaredError - regSquaredError < 0.01)
+  if(prevRegSquaredError - regSquaredError < 0.1) {
+    print("forskel lille")
     break
+  }
+  if(regSquaredError < 1) {
+    print("lille fejl")
+    break
+  }
 }
 
 Rhat <- P %*% t(Q)
