@@ -12,7 +12,7 @@ computeSimItemsMatrix <- function(filename){
       print(Sys.time())
       for(item2 in 1:numberOfItems){
         if(item1 == item2)
-          itemSimilarityMatrix[item1, item2] <- 1
+          itemSimilarityMatrix[item1, item2] <- -1
         else if (item2 < item1)
           itemSimilarityMatrix[item1, item2] <- itemSimilarityMatrix[item2, item1]
         else
@@ -20,6 +20,10 @@ computeSimItemsMatrix <- function(filename){
       }
       
       print(paste(item1, "out of", numberOfItems, "completed"))
+    }
+    
+    for(row in 1:numberOfItems){
+      itemSimilarityMatrix[row, ] <- order(itemSimilarityMatrix[row, ], decreasing = TRUE)
     }
     
     write.table(itemSimilarityMatrix, file = paste(filename, "SimItems.csv", sep = ""), sep = ",", row.names = F, col.names = F)

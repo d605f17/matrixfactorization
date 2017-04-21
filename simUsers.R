@@ -12,7 +12,7 @@ computeSimUsersMatrix <- function(filename){
       print(Sys.time())
       for(user2 in 1:numberOfUsers){
         if(user1 == user2)
-          userSimilarityMatrix[user1, user2] <- 1
+          userSimilarityMatrix[user1, user2] <- -1
         else if (user2 < user1)
           userSimilarityMatrix[user1, user2] <- userSimilarityMatrix[user2, user1]
         else
@@ -20,6 +20,10 @@ computeSimUsersMatrix <- function(filename){
       }
       
        print(paste(user1, "out of", numberOfUsers, "completed"))
+    }
+    
+    for(row in 1:numberOfUsers){
+      userSimilarityMatrix[row, ] <- order(userSimilarityMatrix[row, ], decreasing = TRUE)
     }
     
     write.table(userSimilarityMatrix, file = paste(filename, "SimUsers.csv", sep = ""), sep = ",", row.names = F, col.names = F)
