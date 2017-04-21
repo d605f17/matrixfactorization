@@ -12,7 +12,7 @@ computeSimUsersMatrix <- function(filename){
       print(Sys.time())
       for(user2 in 1:numberOfUsers){
         if(user1 == user2)
-          userSimilarityMatrix[user1, user2] <- -1
+          userSimilarityMatrix[user1, user2] <- 1
         else if (user2 < user1)
           userSimilarityMatrix[user1, user2] <- userSimilarityMatrix[user2, user1]
         else
@@ -22,9 +22,6 @@ computeSimUsersMatrix <- function(filename){
        print(paste(user1, "out of", numberOfUsers, "completed"))
     }
     
-    for(row in 1:numberOfUsers){
-      userSimilarityMatrix[row, ] <- order(userSimilarityMatrix[row, ], decreasing = TRUE)
-    }
     write.table(userSimilarityMatrix, file = paste(filename, "SimUsers.csv", sep = ""), sep = ",", row.names = F, col.names = F)
     return(userSimilarityMatrix)
   }  
@@ -37,37 +34,37 @@ similarityUser <- function(userI, userJ){
   avgUserI <- avgUserRating(userI);
   avgUserJ <- avgUserRating(userJ);
   
+  coRatedItems <- which(!is.na(ratingsMatrix[userI, ]) & !is.na(ratingsMatrix[userJ, ]))
+  
+  if(length(coRatedItems) < 5)
+    return(0)
+  
   topPart <- 0;
   bottomPart1 <- 0;
   bottomPart2 <- 0;
   
-  for(item in 1:numberOfItems){
+  for(item in coRatedItems){
     ratingUserI <- as.numeric(ratingsMatrix[userI, item])
     ratingUserJ <- as.numeric(ratingsMatrix[userJ, item])
     
-    if(!is.na(ratingUserI) && !is.na(ratingUserJ)){
-      topPart <- topPart + (ratingUserI - avgUserI)*(ratingUserJ - avgUserJ);
-      bottomPart1 <- bottomPart1 + (ratingUserI - avgUserI)^2;
-      bottomPart2 <- bottomPart2 + (ratingUserJ - avgUserJ)^2;
-    }
+    topPart <- topPart + (ratingUserI - avgUserI)*(ratingUserJ - avgUserJ);
+    bottomPart1 <- bottomPart1 + (ratingUserI - avgUserI)^2;
+    bottomPart2 <- bottomPart2 + (ratingUserJ - avgUserJ)^2;
   }
   
-  return(topPart / (sqrt(bottomPart1) * sqrt(bottomPart2)))
+  return(topPart / (sqrt(bottomPart1 * bottomPart2)))
 }
 
 avgUserRating <- function(user){
-  ratedItems <- 0;
+  ratedItems <- which(!is.na(ratingsMatrix[user, ]));
   accumulatedRatings <- 0;
   
-  for(item in 1:numberOfItems){
+  for(item in ratedItems){
     rating <- as.numeric(ratingsMatrix[user, item])
-    if(!is.na(rating)){
-      ratedItems <- ratedItems + 1;
-      accumulatedRatings <- accumulatedRatings + rating;
-    }
+    accumulatedRatings <- accumulatedRatings + rating;
   }
   
-  return(accumulatedRatings / ratedItems);
+  return(accumulatedRatings / length(ratedItems));
 }
 
 simUsersVector <- function(userId, n, P) {

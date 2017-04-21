@@ -74,8 +74,7 @@ train <- function(filename, lambda, lambdaU, lambdaI, gamma){
       break
     }
     
-    if(step %% 100 == 1)
-      print(paste(step, "iterations out of 5000 completed"))
+    print(paste(step, "iterations out of 5000 completed"))
   }
   
   return(P %*% t(Q))
