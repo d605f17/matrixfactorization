@@ -2,7 +2,7 @@ computeSimUsersMatrix <- function(filename){
   if(file.exists(paste(getwd(), "/", filename, "SimUsers.csv", sep = ""))){
     print("SimUsers file found")
     userSimilarityMatrix <- read_csv(paste(getwd(), "/", paste(tolower(filename), "SimUsers.csv", sep = ""), sep = ""), 
-                               col_names = FALSE, cols(.default = col_integer()))
+                               col_names = FALSE, cols(.default = col_double()))
     return(as.matrix(userSimilarityMatrix))
   } else {
     print("SimUsers file not found. This will take some time")

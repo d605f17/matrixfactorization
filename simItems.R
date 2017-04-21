@@ -2,7 +2,7 @@ computeSimItemsMatrix <- function(filename){
   if(file.exists(paste(tolower(filename), "SimItems.csv", sep = ""))){
     print("SimItems file found")
     simItemsMatrix <- read_csv(paste(getwd(), "/", paste(tolower(filename), "SimItems.csv", sep = ""), sep = ""), 
-                               col_names = FALSE, cols(.default = col_integer()))
+                               col_names = FALSE, cols(.default = col_double()))
     return(as.matrix(simItemsMatrix))
   } else {
     print("SimItems file not found. This will take some time")
