@@ -1,0 +1,9 @@
+Det tager lang tid at regne simUsers og simItems ud
+
+antal udregninger: sum(i=1 til n) n-i = (n-1) + (n-2) + ... + n = n/2
+hver udregning tager ca. 6 sek
+
+
+
+
+ 
