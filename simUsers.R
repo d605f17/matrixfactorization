@@ -9,14 +9,13 @@ computeSimUsersMatrix <- function(filename){
     userSimilarityMatrix <- matrix(nrow = numberOfUsers, ncol = numberOfUsers)
     
     for(user1 in 1:numberOfUsers){
-      print(Sys.time())
       for(user2 in 1:numberOfUsers){
         if(user1 == user2)
           userSimilarityMatrix[user1, user2] <- -1
         else if (user2 < user1)
           userSimilarityMatrix[user1, user2] <- userSimilarityMatrix[user2, user1]
         else
-          userSimilarityMatrix[user1, user2] <- similarityUser(user1, user2)
+          userSimilarityMatrix[user1, user2] <- pearsonUsers(user1, user2)
       }
       
        print(paste(user1, "out of", numberOfUsers, "completed"))
@@ -32,31 +31,16 @@ computeSimUsersMatrix <- function(filename){
   
 }
 
-similarityUser <- function(userI, userJ){
-  #Consider a minimum of co-rated items
-  
-  avgUserI <- avgUserRating(userI);
-  avgUserJ <- avgUserRating(userJ);
-  
-  coRatedItems <- which(!is.na(ratingsMatrix[userI, ]) & !is.na(ratingsMatrix[userJ, ]))
+pearsonUsers <- function(user1, user2){
+  coRatedItems <- which(!is.na(ratingsMatrix[user1, ]) & !is.na(ratingsMatrix[user2, ]))
   
   if(length(coRatedItems) < 5)
     return(0)
   
-  topPart <- 0;
-  bottomPart1 <- 0;
-  bottomPart2 <- 0;
-  
-  for(item in coRatedItems){
-    ratingUserI <- as.numeric(ratingsMatrix[userI, item])
-    ratingUserJ <- as.numeric(ratingsMatrix[userJ, item])
-    
-    topPart <- topPart + (ratingUserI - avgUserI)*(ratingUserJ - avgUserJ);
-    bottomPart1 <- bottomPart1 + (ratingUserI - avgUserI)^2;
-    bottomPart2 <- bottomPart2 + (ratingUserJ - avgUserJ)^2;
-  }
-  
-  return(topPart / (sqrt(bottomPart1 * bottomPart2)))
+  return(cor(ratingsMatrix[user1, ], 
+             ratingsMatrix[user2, ], 
+             use = "pairwise.complete.obs", 
+             method = "pearson"))
 }
 
 avgUserRating <- function(user){

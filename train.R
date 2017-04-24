@@ -1,4 +1,4 @@
-train <- function(filename, lambda, lambdaU, lambdaI, gamma){
+train <- function(filename, lambda, lambdaU, lambdaI, gamma, n){
   Q <- matrix(runif(numberOfItems * K, 0, 1), nrow = numberOfItems, ncol = K)
   P <- matrix(runif(numberOfUsers * K, 0, 1), nrow = numberOfUsers, ncol = K)
   library(readr)
@@ -53,8 +53,8 @@ train <- function(filename, lambda, lambdaU, lambdaI, gamma){
       regSquaredError <-  as.numeric(regSquaredError +
                                        (r_ij - t(q_j) %*% p_i)^2 +
                                        lambda * (norm(q_j, type = "f")^2 + norm(p_i, type = "f")^2) +
-                                       lambdaU * norm(p_i - simUsersVector(userId, 20, P), type = "f")^2 +
-                                       lambdaI * norm(q_j - simItemsVector(itemId, 20, Q), type = "f")^2)
+                                       lambdaU * norm(p_i - simUsersVector(userId, n, P), type = "f")^2 +
+                                       lambdaI * norm(q_j - simItemsVector(itemId, n, Q), type = "f")^2)
       # -----
       
       # Updating P and Q -----
@@ -76,6 +76,13 @@ train <- function(filename, lambda, lambdaU, lambdaI, gamma){
     
     print(paste(step, "iterations out of 5000 completed"))
   }
+  
+  write(paste("---", filename, "---"), file = paste(filename, "Results.txt", sep = ""), append = TRUE)
+  write(paste("gamma=", gamma), file = paste(filename, "Results.txt", sep = ""), append = TRUE)
+  write(paste("lambda=", lambda), file = paste(filename, "Results.txt", sep = ""), append = TRUE)
+  write(paste("lambdaU=", lambdaU), file = paste(filename, "Results.txt", sep = ""), append = TRUE)
+  write(paste("lambdaI=", lambdaI), file = paste(filename, "Results.txt", sep = ""), append = TRUE)
+  write(paste("N=", n), file = paste(filename, "Results.txt", sep = ""), append = TRUE)
   
   return(P %*% t(Q))
 }

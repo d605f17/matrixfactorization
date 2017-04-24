@@ -21,7 +21,6 @@ test <- function(filename, Rhat) {
   RMSE <- sqrt(1/nrow(testData) * squaredError)
   MAE <- 1/nrow(testData) * absError
   
-  print(paste("---", filename, "---"))
-  print(paste("RMSE=", RMSE))
-  print(paste("MAE=", MAE))
+  write(paste("RMSE=", RMSE), file = paste(filename, "Results.txt"), append = TRUE)
+  write(paste("MAE=", MAE), file = paste(filename, "Results.txt"), append = TRUE)
 }

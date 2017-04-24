@@ -16,7 +16,7 @@ computeSimItemsMatrix <- function(filename){
         else if (item2 < item1)
           itemSimilarityMatrix[item1, item2] <- itemSimilarityMatrix[item2, item1]
         else
-          itemSimilarityMatrix[item1, item2] <- similarityItem(item1, item2)
+          itemSimilarityMatrix[item1, item2] <- pearsonItems(item1, item2)
       }
       
       print(paste(item1, "out of", numberOfItems, "completed"))
@@ -31,30 +31,15 @@ computeSimItemsMatrix <- function(filename){
   }
 }
 
-similarityItem <- function(itemI, itemJ){
-  #Consider a minimum of co-rated items
-  
-  avgItemI <- avgItemRating(itemI);
-  avgItemJ <- avgItemRating(itemJ);
-  
-  coUsers <- which(!is.na(ratingsMatrix[, itemI]) & !is.na(ratingsMatrix[, itemJ]))
+pearsonItems <- function(item1, item2){
+  coUsers <- which(!is.na(ratingsMatrix[, item1]) & !is.na(ratingsMatrix[, item2]))
   if(length(coUsers) < 5)
     return(0)
   
-  topPart <- 0;
-  bottomPart1 <- 0;
-  bottomPart2 <- 0;
-  
-  for(user in coUsers){
-    ratingItemI <- as.numeric(ratingsMatrix[user, itemI])
-    ratingItemJ <- as.numeric(ratingsMatrix[user, itemJ])
-    
-    topPart <- topPart + (ratingItemI - avgItemI)*(ratingItemJ - avgItemJ);
-    bottomPart1 <- bottomPart1 + (ratingItemI - avgItemI)^2;
-    bottomPart2 <- bottomPart2 + (ratingItemJ - avgItemJ)^2;
-}
-  
-  return(topPart / (sqrt(bottomPart1) * sqrt(bottomPart2)))
+  return(cor(ratingsMatrix[, item1],
+             ratingsMatrix[, item2],
+             use = "pairwise.complete.obs",
+             method = "pearson"))
 }
 
 avgItemRating <- function(item){
