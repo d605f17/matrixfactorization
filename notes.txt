@@ -3,7 +3,9 @@ Ellers får man 0
 
 Det samme med items!
 
-
-
-
+n = 40
+K = 20
+lambda = 0.05
+lambdaU = lambdaI = 0.005
+gamma = 0.005
  

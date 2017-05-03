@@ -77,12 +77,5 @@ train <- function(filename, lambda, lambdaU, lambdaI, gamma, n){
     print(paste(step, "iterations out of 5000 completed"))
   }
   
-  write(paste("---", filename, "---"), file = paste(filename, "Results.txt", sep = ""), append = TRUE)
-  write(paste("gamma=", gamma), file = paste(filename, "Results.txt", sep = ""), append = TRUE)
-  write(paste("lambda=", lambda), file = paste(filename, "Results.txt", sep = ""), append = TRUE)
-  write(paste("lambdaU=", lambdaU), file = paste(filename, "Results.txt", sep = ""), append = TRUE)
-  write(paste("lambdaI=", lambdaI), file = paste(filename, "Results.txt", sep = ""), append = TRUE)
-  write(paste("N=", n), file = paste(filename, "Results.txt", sep = ""), append = TRUE)
-  
   return(P %*% t(Q))
 }
