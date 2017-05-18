@@ -1,6 +1,6 @@
 train <- function(filename, lambda, lambdaU, lambdaI, gamma, n){
-  Q <- matrix(runif(numberOfItems * K, 0, 1), nrow = numberOfItems, ncol = K)
-  P <- matrix(runif(numberOfUsers * K, 0, 1), nrow = numberOfUsers, ncol = K)
+  Q <- matrix(runif(numberOfItems * K, 0, 0.1), nrow = numberOfItems, ncol = K)
+  P <- matrix(runif(numberOfUsers * K, 0, 0.1), nrow = numberOfUsers, ncol = K)
   library(readr)
   # Reading trainData -----
   print("Reading training data")
@@ -49,19 +49,21 @@ train <- function(filename, lambda, lambdaU, lambdaI, gamma, n){
       r_ij <- rating
       
       # Check for NA entries in similarUsers
+      simItems <- simItemsVector(itemId, n, Q)
+      simUsers <- simUsersVector(userId, n, P)
       # Calculating Regularized Squared Error -----
       regSquaredError <-  as.numeric(regSquaredError +
                                        (r_ij - t(q_j) %*% p_i)^2 +
                                        lambda * (norm(q_j, type = "f")^2 + norm(p_i, type = "f")^2) +
-                                       lambdaU * norm(p_i - simUsersVector(userId, n, P), type = "f")^2 +
-                                       lambdaI * norm(q_j - simItemsVector(itemId, n, Q), type = "f")^2)
+                                       lambdaU * norm(p_i - simUsers, type = "f")^2 +
+                                       lambdaI * norm(q_j - simItems, type = "f")^2)
       # -----
       
       # Updating P and Q -----
       error <- as.numeric(r_ij - t(q_j) %*% p_i)
       
-      Q[itemId, ] <- q_j + gamma * (error * p_i - lambda * q_j)
-      P[userId, ] <- p_i + gamma * (error * q_j - lambda * p_i)
+      Q[itemId, ] <- q_j + gamma * (2 * error * p_i - lambda * q_j - lambdaI * (q_j - simItems))
+      P[userId, ] <- p_i + gamma * (2 * error * q_j - lambda * p_i - lambdaU * (p_i - simUsers))
       # -----
     }
     print(Sys.time())
