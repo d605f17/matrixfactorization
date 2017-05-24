@@ -44,29 +44,38 @@ train <- function(filename, lambda, lambdaU, lambdaI, gamma, n){
       itemId <- as.numeric(trainData[row, 2])
       rating <- as.numeric(trainData[row, 3])
       
-      q_j <- as.matrix(Q[itemId, ])
-      p_i <- as.matrix(P[userId, ])
+      q_j <- t(as.matrix(Q[itemId, ]))
+      p_i <- t(as.matrix(P[userId, ]))
       r_ij <- rating
       
       # Check for NA entries in similarUsers
-      simItems <- simItemsVector(itemId, n, Q)
-      simUsers <- simUsersVector(userId, n, P)
+      
+      # Compute SimItems and SimUsers
+      simItems <- t(as.matrix(simItemsVector(itemId, n, Q)))
+      simUsers <- t(as.matrix(simUsersVector(userId, n, P)))
+      
+      error <- as.numeric(r_ij - p_i %*% t(q_j))
       # Calculating Regularized Squared Error -----
-      regSquaredError <-  as.numeric(regSquaredError +
-                                       (r_ij - t(q_j) %*% p_i)^2 +
-                                       lambda * (norm(q_j, type = "f")^2 + norm(p_i, type = "f")^2) +
-                                       lambdaU * norm(p_i - simUsers, type = "f")^2 +
-                                       lambdaI * norm(q_j - simItems, type = "f")^2)
+      
+      # Original regSquaredError
+      regSquaredError <- as.numeric(regSquaredError + 
+                                      (r_ij + error)^2 + 
+                                      lambda * (norm(q_j, type = "f")^2 + norm(p_i, type = "f")^2)
+      )
+      
+      # regSquaredError from Joshi et al.
+      # regSquaredError <-  as.numeric(regSquaredError +
+      #                                  (r_ij - error)^2 +
+      #                                  lambda * (norm(q_j, type = "f")^2 + norm(p_i, type = "f")^2) +
+      #                                  lambdaU * norm(p_i - simUsers, type = "f")^2 +
+      #                                  lambdaI * norm(q_j - simItems, type = "f")^2)
       # -----
       
       # Updating P and Q -----
-      error <- as.numeric(r_ij - t(q_j) %*% p_i)
-      
       Q[itemId, ] <- q_j + gamma * (2 * error * p_i - lambda * q_j - lambdaI * (q_j - simItems))
       P[userId, ] <- p_i + gamma * (2 * error * q_j - lambda * p_i - lambdaU * (p_i - simUsers))
       # -----
     }
-    print(Sys.time())
     
     # if difference in error is small stop!
     if(abs(prevRegSquaredError - regSquaredError) < 0.1) {
@@ -77,6 +86,7 @@ train <- function(filename, lambda, lambdaU, lambdaI, gamma, n){
     }
     
     print(paste(step, "iterations out of 5000 completed"))
+    print(paste("error:", regSquaredError))
   }
   
   return(P %*% t(Q))
