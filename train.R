@@ -86,7 +86,7 @@ train <- function(filename, lambda, lambdaU, lambdaI, gamma, n){
     }
     
     # if difference in error is small stop!
-    if(abs(prevRegSquaredError - regSquaredError) < 0.1) {
+    if(abs(prevRegSquaredError - regSquaredError) < 1) {
       break
     }
     if(regSquaredError < 1) {
