@@ -33,11 +33,11 @@ train <- function(filename, lambda, lambdaU, lambdaI, gamma, n){
   
   regSquaredError <- 0
 
-  logToFile(paste(filename, "Logfile.txt", sep = ""),
+  logToFile(paste(filename, lambdaU, "Logfile.txt", sep = "_"),
             "time, iteration, regSquaredError")
   
   print("Training started")
-  for(step in 1:5000){
+  for(step in 1:500){
     prevRegSquaredError <- regSquaredError
     regSquaredError <- 0
     
@@ -86,16 +86,13 @@ train <- function(filename, lambda, lambdaU, lambdaI, gamma, n){
     }
     
     # if difference in error is small stop!
-    if(abs(prevRegSquaredError - regSquaredError) < 0.1) {
-      break
-    }
-    if(regSquaredError < 1) {
+    if(abs(prevRegSquaredError - regSquaredError) < 5) {
       break
     }
     
-    print(paste(step, "iterations out of 5000 completed"))
+    print(paste(step, "iterations out of 500 completed"))
     print(paste("error:", prevRegSquaredError - regSquaredError))
-    logToFile(paste(filename, "Logfile.txt", sep = ""),
+    logToFile(paste(filename, lambdaU, "Logfile.txt", sep = "_"),
               paste(Sys.time(), step, regSquaredError, sep = ",")
     )
   }
