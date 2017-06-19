@@ -61,27 +61,27 @@ train <- function(filename, lambda, lambdaU, lambdaI, gamma, n){
       # Calculating Regularized Squared Error -----
       
       # Original regSquaredError
-      # regSquaredError <- as.numeric(regSquaredError + 
-      #                                 error^2 + 
-      #                                 lambda * (norm(q_j, type = "f")^2 + norm(p_i, type = "f")^2)
+      regSquaredError <- as.numeric(regSquaredError +
+                                      error^2 +
+                                      lambda * (norm(q_j, type = "f")^2 + norm(p_i, type = "f")^2))
       # )
       
       # Updating P and Q riginal mf -----
-      # Q[itemId, ] <- q_j + gamma * (error * p_i - lambda * q_j)
-      # P[userId, ] <- p_i + gamma * (error * q_j - lambda * p_i)
+      Q[itemId, ] <- q_j + gamma * (error * p_i - lambda * q_j)
+      P[userId, ] <- p_i + gamma * (error * q_j - lambda * p_i)
       # -----
       
       # regSquaredError from Joshi et al.
-      regSquaredError <-  as.numeric(regSquaredError +
-                                       error^2 +
-                                       lambda * (norm(q_j, type = "f")^2 + norm(p_i, type = "f")^2) +
-                                       lambdaU * norm(p_i - simUsers, type = "f")^2 +
-                                       lambdaI * norm(q_j - simItems, type = "f")^2)
+      # regSquaredError <-  as.numeric(regSquaredError +
+      #                                  error^2 +
+      #                                  lambda * (norm(q_j, type = "f")^2 + norm(p_i, type = "f")^2) +
+      #                                  lambdaU * norm(p_i - simUsers, type = "f")^2 +
+      #                                  lambdaI * norm(q_j - simItems, type = "f")^2)
       # -----
       
       # Updating P and Q joshi et al. -----
-      Q[itemId, ] <- q_j + gamma * (error * p_i - lambda * q_j - lambdaI * (q_j - simItems))
-      P[userId, ] <- p_i + gamma * (error * q_j - lambda * p_i - lambdaU * (p_i - simUsers))
+      # Q[itemId, ] <- q_j + gamma * (error * p_i - lambda * q_j - lambdaI * (q_j - simItems))
+      # P[userId, ] <- p_i + gamma * (error * q_j - lambda * p_i - lambdaU * (p_i - simUsers))
       # -----
     }
     
